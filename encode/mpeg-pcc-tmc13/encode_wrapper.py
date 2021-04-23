@@ -39,7 +39,11 @@ def make_cfg(gpcc_bin_path, ref_path, cfg_dir, output_dir, g, c):
     rst.append('planarEnabled: 1')
     rst.append('planarModeIdcmUse: 0')
     rst.append('convertPlyColourspace: 1')
-    rst.append('transformType: 1')
+    rst.append('transformType: 2')
+    rst.append('numberOfNearestNeighborsInPrediction: 3')
+    rst.append('levelOfDetailCount: 11')
+    rst.append('lodDecimator: 0')
+    rst.append('adaptivePredictionThreshold: 64')
     rst.append('qpChromaOffset: 0')
     rst.append('bitdepth: 8')
     rst.append('positionQuantizationScale: {}'.format(g))   
@@ -69,43 +73,67 @@ def process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq, g, c):
 
 if __name__ == '__main__':
 
-    gpcc_bin_path = '../../mpeg-pcc-tmc13/build/tmc3/tmc3'
-    ref_dir = '../../data/mpeg/ref/'
-    cfg_dir = './cfg'
-    output_dir = './ply'
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    gpcc_bin_path = os.path.abspath(os.path.join(dir_path, '../../mpeg-pcc-tmc13/build/tmc3/tmc3'))
+    ref_dir = os.path.abspath(os.path.join(dir_path, '../../data/mpeg/ref/'))
+    cfg_dir = os.path.abspath(os.path.join(dir_path, './cfg'))
+    output_dir = os.path.abspath(os.path.join(dir_path, './ply'))
     
 
-    seq_15 = ['loot.ply']
+    seq_15 = []
     g_15 = [1.0, 1.0/512, 1.0/256, 1.0/64, 1.0/32, 1.0/8, 1.0/4]
 
-    seq_14 = ['loot.ply']
+    seq_14 = []
     g_14 = [1.0, 1.0/256, 1.0/128, 1.0/64, 1.0/16, 1.0/8, 1.0/4]
 
-    seq_13 = ['loot.ply']
+    seq_13 = []
     g_13 = [1.0, 1.0/64, 1.0/32, 1.0/16, 1.0/8, 1.0/4, 1.0/2]
 
-    seq_12 = ['loot.ply']
+    seq_12 = ['boxer_viewdep_vox12.ply',
+    'Thaidancer_viewdep_vox12.ply']
     g_12 = [1.0, 1.0/32, 1.0/16, 1.0/8, 1.0/4, 1.0/2, 3.0/4]
 
-    seq_11 = ['loot.ply']
+    seq_11 = ['basketball_player_vox11_00000200.ply',
+              'dancer_vox11_00000001.ply']
     g_11 = [1.0, 1.0/16, 1.0/8, 1.0/4, 1.0/2, 3.0/4, 7.0/8]
 
-    seq_10 = ['loot.ply']
+    seq_10 = ['queen_0200.ply', 
+              'soldier_vox10_0690.ply', 
+              'redandblack_vox10_1550.ply', 
+              'loot_vox10_1200.ply', 
+              'longdress_vox10_1300.ply']
     g_10 = [1.0, 1.0/8, 1.0/4, 1.0/2, 3.0/4, 7.0/8, 15.0/16]
 
     
     c = [4, 22, 28, 34, 40, 46, 51]
 
     cmd_all = []
-    cmd_all.append(process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_15, g_15, c))
-    cmd_all.append(process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_14, g_14, c))
-    cmd_all.append(process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_13, g_13, c))
-    cmd_all.append(process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_12, g_12, c))
-    cmd_all.append(process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_11, g_11, c))
-    cmd_all.append(process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_10, g_10, c))
+    if len(seq_15) > 0:
+        cmd = process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_15, g_15, c)
+        cmd_all.extend(cmd)
+    
+    if len(seq_14) > 0:
+        cmd = process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_14, g_14, c)
+        cmd_all.extend(cmd)
+
+    if len(seq_13) > 0:
+        cmd = process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_13, g_13, c)
+        cmd_all.extend(cmd)
+
+    if len(seq_12) > 0:
+        cmd = process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_12, g_12, c)
+        cmd_all.extend(cmd)
+
+    if len(seq_11) > 0:
+        cmd = process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_11, g_11, c)
+        # cmd_all.extend(cmd)
+    
+    if len(seq_10) > 0:
+        cmd = process_one_depth(gpcc_bin_path, ref_dir, cfg_dir, output_dir, seq_10, g_10, c)
+        # cmd_all.extend(cmd) 
 
 
-    with open('run_gpcc_encode_new.sh', 'w') as f:
+    with open('run_gpcc_encode.sh', 'w') as f:
         for item in cmd_all:
             print(item)
             f.write('%s & \n' % item)
